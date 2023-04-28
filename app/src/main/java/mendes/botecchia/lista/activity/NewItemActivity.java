@@ -17,7 +17,7 @@ import android.widget.Toast;
 import mendes.botecchia.lista.R;
 
 public class NewItemActivity extends AppCompatActivity {
-}
+
 
     static int PHOTO_PICKER_REQUEST = 1;
     Uri photoSelected = null;
@@ -77,8 +77,7 @@ public class NewItemActivity extends AppCompatActivity {
         if(requestCode == PHOTO_PICKER_REQUEST) {
             if(resultCode == Activity.RESULT_OK) {
                 photoSelected = data.getData();
-                ImageView imvfotoPreview =
-                        findViewById(R.id.imvfotoPreview);
+                ImageView imvfotoPreview = findViewById(R.id.imvfotoPreview);
                 imvfotoPreview.setImageURI(photoSelected);
             }
         }
