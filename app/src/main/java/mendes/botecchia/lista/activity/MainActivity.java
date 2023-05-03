@@ -1,22 +1,27 @@
 package mendes.botecchia.lista.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import mendes.botecchia.lista.R;
 import mendes.botecchia.lista.adapter.MyAdapter;
+import mendes.botecchia.lista.model.MainActivityViewModel;
 import mendes.botecchia.lista.util.MyItem;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,15 +31,24 @@ public class MainActivity extends AppCompatActivity {
     MyAdapter myAdapter;
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == NEW_ITEM_REQUEST) {
             if(resultCode == Activity.RESULT_OK) {
                 MyItem myItem = new MyItem();
                 myItem.title = data.getStringExtra("title");
                 myItem.description = data.getStringExtra("description");
-                myItem.photo = data.getData();
+                Uri selectedPhotoURI = data.getData();
+
+                try {
+                    Bitmap photo = com.example.produtos.util.Util.getBitmap( MainActivity.this, selectedPhotoURI, 100, 100 );
+                    myItem.photo = photo;
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                MainActivityViewModel vm = new ViewModelProvider( this ).get(MainActivityViewModel.class );
+                List<MyItem> itens = vm.getItens();
 
                 itens.add(myItem);
                 myAdapter.notifyItemInserted(itens.size()-1);
@@ -59,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         RecyclerView rvItens = findViewById(R.id.rvItens);
+
+        MainActivityViewModel vm = new ViewModelProvider( this ).get(
+                MainActivityViewModel.class );
+        List<MyItem> itens = vm.getItens();
+
 
         myAdapter = new MyAdapter(this,itens);
         rvItens.setAdapter(myAdapter);
